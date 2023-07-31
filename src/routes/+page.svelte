@@ -15,7 +15,7 @@
 
 	async function onFocus() {
 		$feedbackStore.setPageLoading(true);
-		await invalidate('/api/feedbacks');
+		await invalidate('fetch:feedbacks');
 		$feedbackStore.setPageLoading(false);
 	}
 
@@ -29,6 +29,10 @@
 
 	$: pageLoading = $feedbackStore.pageloading;
 </script>
+
+<svelte:head>
+	<title>Feedback App ✅</title>
+</svelte:head>
 
 <main class="md:container mt-10 sm:mt-24 px-5">
 	<FeedbackForm {form} />

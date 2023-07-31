@@ -1,5 +1,5 @@
 <script lang="ts">
-	let selected = 10;
+	export let selected = 10;
 </script>
 
 <ul
@@ -19,7 +19,6 @@
 				name="rating"
 				value={i}
 				bind:group={selected}
-				on:change={() => (selected = i)}
 			/>
 			<label
 				for={`feedback-rating-radio-button-${i}`}

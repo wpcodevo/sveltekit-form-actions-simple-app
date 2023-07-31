@@ -1,20 +1,22 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import feedbackStore from '$lib/store';
-	import type { Feedback } from '@prisma/client';
-	import type { SubmitFunction } from '@sveltejs/kit';
 	import { toast } from '@zerodevx/svelte-toast';
 	import { tick } from 'svelte';
 	import { fade } from 'svelte/transition';
+
+	import feedbackStore from '$lib/store';
+	import type { Feedback } from '@prisma/client';
+	import type { SubmitFunction } from '@sveltejs/kit';
 	import type { ActionData } from '../routes/$types';
 
 	export let feedback: Feedback;
 	export let form: ActionData;
 
 	let editing = false;
+	let editedFeedbackText = feedback.text;
 
-	function toggleEdit() {
-		editing = !editing;
+	function windowConfirm(message: string) {
+		return window.confirm(message);
 	}
 
 	let inputElement: HTMLInputElement | null = null;
@@ -30,22 +32,29 @@
 		const deleteAction = options.action.search.includes('deleteFeedback');
 		const editAction = options.action.search.includes('editFeedback');
 
-		const editedFeedbackText = String(options.formData.get('text'));
+		if (deleteAction) {
+			const confirm = windowConfirm('Do you really want to delete this item?');
+			if (!confirm) {
+				options.cancel();
+				return;
+			}
+		}
 
 		if (feedback.text === editedFeedbackText && editAction) {
-			toggleEdit();
+			editing = false;
 			options.cancel();
 			return;
 		}
 
 		$feedbackStore.setPageLoading(true);
 		return async ({ update, result }) => {
-			if (result.type === 'success' && editAction) toggleEdit();
+			if (result.type === 'success' && editAction) editing = false;
 			await update();
 
-			if (result.status === 200 && editAction) {
+			if (result.type === 'success' && editAction) {
 				toast.push('Edited Feedback Successfully', { classes: ['success'] });
-			} else if (result.status === 200 && deleteAction) {
+			} else if (result.type === 'success' && deleteAction) {
+				editing = false;
 				toast.push('Deleted Feedback Successfully', { classes: ['success'] });
 			}
 
@@ -77,7 +86,7 @@
 		type="button"
 		class="absolute top-2 right-12 text-pink-500 hover:text-pink-700"
 		class:hidden={editing}
-		on:click={toggleEdit}>Edit</button
+		on:click={() => (editing = true)}>Edit</button
 	>
 	{#if editing}
 		<div class="flex flex-col items-center sm:flex-row justify-between sm:gap-4 gap-y-2">
@@ -85,11 +94,12 @@
 				type="text"
 				name="text"
 				class="border rounded-lg p-2 w-full focus:outline-none"
-				value={feedback.text}
+				bind:value={editedFeedbackText}
+				bind:this={inputElement}
 			/>
 			<div class="flex gap-2">
 				<button type="submit" class="text-pink-500 hover:text-pink-700">Save</button>
-				<button class="hover:text-pink-700" on:click={toggleEdit}>Cancel</button>
+				<button class="hover:text-pink-700" on:click={() => (editing = false)}>Cancel</button>
 			</div>
 		</div>
 		{#if form?.message && form.type === 'edit' && feedback.id === form.feedback.id}

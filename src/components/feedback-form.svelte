@@ -1,18 +1,21 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import type { SubmitFunction } from '@sveltejs/kit';
-	import type { ActionData } from '../routes/$types';
+	import { toast } from '@zerodevx/svelte-toast';
 	import Rating from './rating.svelte';
 	import feedbackStore from '$lib/store';
-	import { toast } from '@zerodevx/svelte-toast';
+
+	import type { SubmitFunction } from '@sveltejs/kit';
+	import type { ActionData } from '../routes/$types';
 
 	export let form: ActionData;
+	let rating = 10;
 
 	const handleSubmit: SubmitFunction = () => {
 		$feedbackStore.setPageLoading(true);
-		return async ({ update, result, formElement }) => {
+		return async ({ update, result }) => {
 			await update();
-			if (result.status === 200) {
+			if (result.type === 'success') {
+				rating = 10;
 				toast.push('Added Feedback Successfully', { classes: ['success'] });
 			}
 			$feedbackStore.setPageLoading(false);
@@ -27,7 +30,7 @@
 				>How would you rate your service with us?</label
 			>
 		</div>
-		<Rating />
+		<Rating bind:selected={rating} />
 		<div
 			class="flex flex-col items-center gap-y-4 sm:gap-y-0 sm:flex-row sm:border rounded-lg sm:my-4 px-2 py-3"
 		>
@@ -47,7 +50,9 @@
 			</button>
 		</div>
 		{#if form?.message && form.type === 'add'}
-			<div class="sm:pt-3 text-center text-purple-600">{form.message}</div>
+			<div role="alert" aria-live="polite" class="sm:pt-3 text-center text-purple-600">
+				{form.message}
+			</div>
 		{/if}
 	</form>
 </div>

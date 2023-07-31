@@ -1,9 +1,10 @@
-import { error, type Actions, fail } from '@sveltejs/kit';
+import { type Actions, fail } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { prisma } from '$lib/server/prisma';
-import type { Feedback } from '@prisma/client';
 
-export const load: PageServerLoad = async ({ url }) => {
+export const load: PageServerLoad = async ({ url, depends }) => {
+	depends('fetch:feedbacks');
+
 	const pageQueryParam = url.searchParams.get('page');
 	const limitQueryParam = url.searchParams.get('limit');
 	const orderBy = url.searchParams.get('orderBy') === 'asc' ? 'asc' : 'desc';
@@ -52,13 +53,13 @@ export const actions = {
 				return fail(400, {
 					type: 'add',
 					message: 'feedback input cannot be empty',
-					feedback: { text, id: '' }
+					feedback: { text, rating, id: '' }
 				});
 			} else if (text.trim().length < 10) {
 				return fail(400, {
 					type: 'add',
 					message: 'feedback text must be at least 10 characters',
-					feedback: { text, id: '' }
+					feedback: { text, rating, id: '' }
 				});
 			}
 
@@ -76,7 +77,11 @@ export const actions = {
 				});
 			}
 
-			return fail(500, { type: 'add', message: err.message, feedback: { text: '', id: '' } });
+			return fail(500, {
+				type: 'add',
+				message: err.message,
+				feedback: { text: '', id: '' }
+			});
 		}
 	},
 	editFeedback: async ({ url, request }) => {
@@ -106,12 +111,12 @@ export const actions = {
 				});
 			}
 
-			const feedback = await prisma.feedback.update({
+			await prisma.feedback.update({
 				where: { id: feedbackId },
 				data: { text }
 			});
 
-			return { feedback };
+			return { status: 200 };
 		} catch (err: any) {
 			if (err.code === 'P2002') {
 				return fail(409, {
