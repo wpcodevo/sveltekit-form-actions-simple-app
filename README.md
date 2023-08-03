@@ -1,38 +1,34 @@
-# create-svelte
+# Building a FullStack SvelteKit Application with Form Actions
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
+In this article, you will learn how to build a full-stack feedback application in SvelteKit using Form Actions and Prisma ORM. Using Form Actions will enable us to directly mutate data in the database from the frontend application, which means we do not have to go through an API layer.
 
-## Creating a project
+![Building a FullStack SvelteKit Application with Form Actions](https://codevoweb.com/wp-content/uploads/2023/08/Building-a-FullStack-SvelteKit-Application-with-Form-Actions.webp)
 
-If you're seeing this, you've probably already done this step. Congrats!
+## Topics Covered
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
+- Running the FullStack Feedback App
+- Setting up the SvelteKit Project
+- Setting up the Database
+    - Optional: Using Docker
+- Initializing Prisma and Running Database Migrations
+- Instantiating the Prisma Client
+- Adding and Configuring Tailwind CSS
+- Adding a Toast Notification
+- Creating a Svelte Writable Store
+- Loading Data using SvelteKit Load Function
+- Creating the Form Actions
+    - Adding a New Feedback
+    - Editing an Existing Feedback
+    - Deleting a Feedback
+- Creating the Svelte Components
+    - Rating Component
+    - Statistic Component
+    - Feedback Form Component
+    - Feedback Item Component
+- Using the Components in a Page File
+- Testing the SvelteKit Application Locally
+- Deploying the Application to Vercel
+- Conclusion
 
-# create a new project in my-app
-npm create svelte@latest my-app
-```
+Read the entire article here: [https://codevoweb.com/fullstack-sveltekit-application-with-form-actions/](https://codevoweb.com/fullstack-sveltekit-application-with-form-actions/)
 
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```bash
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
